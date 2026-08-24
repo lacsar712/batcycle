@@ -17,11 +17,14 @@ func (a *App) CalibrateFeed(ctx context.Context, tower model.TowerID, holder str
 	if err := a.feedLeases.Require(tower, holder, 30*time.Second); err != nil {
 		return err
 	}
+	// Release on every exit path, including self-diagnosis failure, so a
+	// faulted calibration does not leave the feed lease held and block the
+	// next shift's batch-open interlock until TTL or a full cabinet reset.
+	defer a.feedLeases.ReleaseHolder(tower, holder)
 	if CalibrateProbe != nil {
 		if err := CalibrateProbe(ctx); err != nil {
 			return fmt.Errorf("calibrate: %w", err)
 		}
 	}
-	a.feedLeases.ReleaseHolder(tower, holder)
 	return nil
 }
