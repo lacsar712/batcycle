@@ -27,6 +27,12 @@ func (r *DryRamp) Ramp(ctx context.Context, target float64, apply func(float64))
 	}
 	cur := 0.0
 	for cur < target {
+		// Honor batch abort: a canceled context means the charge ramp must
+		// stop chasing target immediately, otherwise the tail of the ramp
+		// keeps creeping past the abort point on the sampling curve.
+		if err := ctx.Err(); err != nil {
+			return err
+		}
 		cur += step
 		if cur > target {
 			cur = target
