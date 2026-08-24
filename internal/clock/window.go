@@ -19,7 +19,10 @@ func NewAvgTempWindow(clk Clock, duration time.Duration) *AvgTempWindow {
 }
 
 func (w *AvgTempWindow) Active(anchor time.Time) bool {
-	return time.Since(anchor) < w.duration
+	// Measure elapsed against the injected process clock, not the wall clock:
+	// the hold window must follow the (freezable) process clock, so that freezing
+	// the process clock also freezes window progress.
+	return w.clk.Now().Sub(anchor) < w.duration
 }
 
 func (w *AvgTempWindow) Require(anchor time.Time) error {
