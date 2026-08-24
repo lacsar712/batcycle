@@ -16,7 +16,7 @@ func (a *App) ValidateMoistureDrift(ctx context.Context, moistPct float64) error
 	if moistPct <= limit {
 		return nil
 	}
-	return fmt.Errorf("moisture: %v", model.ErrMoistureDrift)
+	return fmt.Errorf("moisture: %w", model.ErrMoistureDrift)
 }
 
 func (a *App) ConfirmGradientHold(ctx context.Context, anchor time.Time) error {
