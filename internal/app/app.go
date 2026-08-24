@@ -154,6 +154,13 @@ func (a *App) ApplyScheduleSnapshot(ctx context.Context, id model.ScheduleID) er
 	now := a.clk.Now()
 	entry, ok := a.sched.ActiveEntry(snap, now)
 	if !ok {
+		// No entry is active right now, but that is not the same as an empty
+		// schedule: an equalization soak window may simply not have opened yet.
+		// Surface "soak not yet due" so the operator can tell the difference
+		// between a pending soak window and a schedule that was emptied.
+		if _, pending := a.sched.PendingEntry(snap, now); pending {
+			return model.Wrap("app", "schedule", model.ErrSoakNotDue)
+		}
 		return model.Wrap("app", "schedule", model.ErrScheduleEmpty)
 	}
 	a.plant.BindAirflow(entry.Plenum, entry.Setpoint)

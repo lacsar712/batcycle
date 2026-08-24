@@ -43,6 +43,24 @@ func (s *ScheduleStore) ActiveEntry(sched model.DryingSchedule, now time.Time) (
 	return model.DryingScheduleEntry{}, false
 }
 
+// PendingEntry reports the next schedule entry whose soak window has not yet
+// opened (now < Start), if any. A pending entry means the schedule is not
+// empty: an equalization soak is merely not yet due, which must not be
+// confused with a schedule that has been emptied.
+func (s *ScheduleStore) PendingEntry(sched model.DryingSchedule, now time.Time) (model.DryingScheduleEntry, bool) {
+	var pending model.DryingScheduleEntry
+	found := false
+	for _, e := range sched.Entries {
+		if now.Before(e.Start) {
+			if !found || e.Start.Before(pending.Start) {
+				pending = e
+				found = true
+			}
+		}
+	}
+	return pending, found
+}
+
 func (s *ScheduleStore) EntriesOverlapping(sched model.DryingSchedule, start, end time.Time) []model.DryingScheduleEntry {
 	var out []model.DryingScheduleEntry
 	for _, e := range sched.Entries {

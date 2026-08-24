@@ -14,6 +14,7 @@ var (
 	ErrAirflowSetpoint = errors.New("batcycle: airflow setpoint violation")
 	ErrFanFault        = errors.New("batcycle: fan fault")
 	ErrScheduleEmpty   = errors.New("batcycle: schedule empty")
+	ErrSoakNotDue      = errors.New("batcycle: soak window not yet due")
 	ErrGradient        = errors.New("batcycle: moisture gradient violation")
 	ErrMoistureDrift   = errors.New("batcycle: moisture drift exceeded")
 	ErrHeatOvertemp    = errors.New("batcycle: heat overtemperature")
