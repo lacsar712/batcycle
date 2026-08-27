@@ -1,6 +1,6 @@
 # batcycle
 
-Lithium cell formation cycling cabinet process control.
+batcycle 是一套锂电池化成柜分容充电工业过程控制系统，用于充电爬坡、电压监护、单元租约与化成节拍联锁。
 
 ## Requirements
 
